@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Retro 2000-2015</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Estilo.css">
+</head>
+<body>
+    <header>
+        <div class="retro-title">Mi Blog Retro</div>
+        <div style="font-size:1em;">Inspirado en los blogs de 2000-2015</div>
+    </header>
+    <div class="container">
+        <div class="modules">
+            <!-- Hora local -->
+            <div class="module" id="hora-local">
+                <h2>Hora Local</h2>
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%;">
+                    <!-- Reloj analógico (más grande) -->
+                    <canvas id="reloj-analogico" width="120" height="120" style="margin-bottom:10px; margin-top:0;"></canvas>
+                    <p style="margin-top:0; margin-bottom:0;">Hora actual: <span id="hora-actual">--:--:--</span></p>
+                </div>
+            </div>
+            <!-- Divisas -->
+            <div class="module" id="divisas">
+                <h2>Divisas (Colón &lt;-&gt; Dólar)</h2>
+                <div>
+                    <p>1 USD = <span id="usd-to-crc">₡---.--</span></p>
+                    <p>1 CRC = <span id="crc-to-usd">$---.--</span></p>
+                </div>
+            </div>
+            <!-- Fecha y clima -->
+            <div class="module" id="fecha-clima">
+                <h2>Fecha y Clima</h2>
+                <div>
+                    <p>Hoy es: <span id="fecha-actual"></span></p>
+                    <p>Clima: <span id="clima-actual">--°C, --</span></p>
+                </div>
+            </div>
+            <!-- Calculadora de edad -->
+            <div class="module" id="calcula-edad">
+                <h2>Calculadora de Edad</h2>
+                <form id="form-edad" onsubmit="return calcularEdad(event)">
+                    <label for="fecha-inicio">Fecha de nacimiento:</label><br>
+                    <input type="date" id="fecha-inicio" required><br>
+                    <label for="fecha-final">Fecha final:</label><br>
+                    <input type="date" id="fecha-final" required><br>
+                    <button type="submit">Calcular</button>
+                </form>
+                <div id="resultado-edad" style="margin-top:10px;font-weight:bold;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; 2025 Mi Blog Retro. Inspirado en la web de los 2000s.
+    </div>
+    <script>
+        // Mostrar hora local en tiempo real (formato 12 horas)
+        function actualizarHora() {
+            const ahora = new Date();
+            const hora = ahora.toLocaleTimeString('es-CR', { hour12: true });
+            document.getElementById('hora-actual').textContent = hora;
+        }
+        setInterval(actualizarHora, 1000);
+        actualizarHora();
+
+        // Mostrar fecha actual
+        document.getElementById('fecha-actual').textContent = new Date().toLocaleDateString('es-CR', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // Obtener clima (ejemplo: San José, CR, usando Open-Meteo API)
+        fetch('https://api.open-meteo.com/v1/forecast?latitude=9.93&longitude=-84.08&current_weather=true')
+            .then(r => r.json())
+            .then(data => {
+                if (data.current_weather) {
+                    document.getElementById('clima-actual').textContent =
+                        data.current_weather.temperature + '°C, ' +
+                        (data.current_weather.weathercode === 0 ? 'Despejado' : 'Nublado');
+                }
+            });
+        // Reloj analógico (ajustado para tamaño 120x120)
+        function dibujarReloj() {
+            const canvas = document.getElementById('reloj-analogico');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const radio = 55;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Círculo exterior
+            ctx.beginPath();
+            ctx.arc(60, 60, radio, 0, 2 * Math.PI);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Números
+            ctx.font = '16px Verdana';
+            ctx.fillStyle = '#444';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            for (let num = 1; num <= 12; num++) {
+                const ang = (num - 3) * (Math.PI * 2) / 12;
+                ctx.fillText(num.toString(), 60 + Math.cos(ang) * (radio - 18), 60 + Math.sin(ang) * (radio - 18));
+            }
+
+            // Hora actual
+            const ahora = new Date();
+            let hora = ahora.getHours();
+            let min = ahora.getMinutes();
+            let seg = ahora.getSeconds();
+
+            // Manecilla de hora
+            let angHora = ((hora % 12) + min / 60) * (Math.PI * 2) / 12 - Math.PI / 2;
+            ctx.beginPath();
+            ctx.moveTo(60, 60);
+            ctx.lineTo(60 + Math.cos(angHora) * (radio - 32), 60 + Math.sin(angHora) * (radio - 32));
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            // Manecilla de minutos
+            let angMin = (min + seg / 60) * (Math.PI * 2) / 60 - Math.PI / 2;
+            ctx.beginPath();
+            ctx.moveTo(60, 60);
+            ctx.lineTo(60 + Math.cos(angMin) * (radio - 18), 60 + Math.sin(angMin) * (radio - 18));
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Manecilla de segundos
+            let angSeg = seg * (Math.PI * 2) / 60 - Math.PI / 2;
+            ctx.beginPath();
+            ctx.moveTo(60, 60);
+            ctx.lineTo(60 + Math.cos(angSeg) * (radio - 10), 60 + Math.sin(angSeg) * (radio - 10));
+            ctx.strokeStyle = '#c00';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Centro
+            ctx.beginPath();
+            ctx.arc(60, 60, 4, 0, 2 * Math.PI);
+            ctx.fillStyle = '#888';
+            ctx.fill();
+        }
+
+        setInterval(dibujarReloj, 1000);
+        dibujarReloj();
+
+        // Calculadora de edad
+        function calcularEdad(event) {
+            event.preventDefault();
+            const inicio = document.getElementById('fecha-inicio').value;
+            const final = document.getElementById('fecha-final').value;
+            if (!inicio || !final) return false;
+            const d1 = new Date(inicio);
+            const d2 = new Date(final);
+            if (d2 < d1) {
+                document.getElementById('resultado-edad').textContent = "La fecha final debe ser posterior a la inicial.";
+                return false;
+            }
+            let años = d2.getFullYear() - d1.getFullYear();
+            let meses = d2.getMonth() - d1.getMonth();
+            let dias = d2.getDate() - d1.getDate();
+            if (dias < 0) {
+                meses--;
+                dias += new Date(d2.getFullYear(), d2.getMonth(), 0).getDate();
+            }
+            if (meses < 0) {
+                años--;
+                meses += 12;
+            }
+            document.getElementById('resultado-edad').textContent =
+                `Edad: ${años} años, ${meses} meses, ${dias} días.`;
+            return false;
+        }
+    </script>
+    <script src="divisas.js"></script>
+</body>
+</html>
