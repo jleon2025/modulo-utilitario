@@ -1,33 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Blog Retro 2000-2015</title>
+    <title>Página de Módulos útiles</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="Estilo.css">
 </head>
+
 <body>
     <header>
-        <div class="retro-title">Mi Blog Retro</div>
-        <div style="font-size:1em;">Inspirado en los blogs de 2000-2015</div>
+        <div class="retro-title">Página de Módulos útiles</div>
     </header>
     <div class="container">
-        <div class="modules">
+        <button id="btn-edit-mode">Editar orden</button>
+        <div class="modules" id="modules-container">
             <!-- Hora local -->
             <div class="module" id="hora-local">
                 <h2>Hora Local</h2>
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%;">
+                <div
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%;">
                     <!-- Reloj analógico (más grande) -->
-                    <canvas id="reloj-analogico" width="120" height="120" style="margin-bottom:10px; margin-top:0;"></canvas>
+                    <canvas id="reloj-analogico" width="120" height="120"
+                        style="margin-bottom:10px; margin-top:0;"></canvas>
                     <p style="margin-top:0; margin-bottom:0;">Hora actual: <span id="hora-actual">--:--:--</span></p>
                 </div>
             </div>
-            <!-- Divisas -->
+            <!-- Divisas CRC to USD -->
             <div class="module" id="divisas">
                 <h2>Divisas (Colón &lt;-&gt; Dólar)</h2>
                 <div>
                     <p>1 USD = <span id="usd-to-crc">₡---.--</span></p>
                     <p>1 CRC = <span id="crc-to-usd">$---.--</span></p>
+                    <hr>
+                    <div style="margin-top: 10px;">
+                        <label for="input-crc">Convertir Colones:</label><br>
+                        <input type="number" id="input-crc" placeholder="Monto en ₡"
+                            style="width: 100%; box-sizing: border-box; margin-top: 5px;">
+                        <p style="margin-top: 5px;">Equivale a: <span id="resultado-usd">$0.00</span></p>
+                    </div>
+                </div>
+            </div>
+            <!-- Divisas USD to CRC (Nuevo) -->
+            <div class="module" id="divisas-usd">
+                <h2>Divisas (Dólar &lt;-&gt; Colón)</h2>
+                <div>
+                    <p>1 USD = <span id="usd-to-crc-2">₡---.--</span></p>
+                    <p>1 CRC = <span id="crc-to-usd-2">$---.--</span></p>
+                    <hr>
+                    <div style="margin-top: 10px;">
+                        <label for="input-usd">Convertir Dólares:</label><br>
+                        <input type="number" id="input-usd" placeholder="Monto en $"
+                            style="width: 100%; box-sizing: border-box; margin-top: 5px;">
+                        <p style="margin-top: 5px;">Equivale a: <span id="resultado-crc">₡0.00</span></p>
+                    </div>
                 </div>
             </div>
             <!-- Fecha y clima -->
@@ -50,10 +76,107 @@
                 </form>
                 <div id="resultado-edad" style="margin-top:10px;font-weight:bold;"></div>
             </div>
+            <!-- Lista de Pendientes -->
+            <div class="module" id="todo-list-module">
+                <h2>Lista de Tareas</h2>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="todo-input" placeholder="Nueva tarea..." style="flex-grow: 1;">
+                    <button onclick="addTodo()" style="margin-top: 0;">+</button>
+                </div>
+                <ul id="todo-list" class="todo-list"></ul>
+            </div>
+            <!-- Temporizador Pomodoro -->
+            <div class="module" id="pomodoro-module">
+                <h2>Temporizador Pomodoro</h2>
+                <div style="display: flex; align-items: center; gap: 5px; justify-content: center; margin-bottom: 5px;">
+                    <input type="number" id="pomodoro-mins" value="25" style="width: 40px;">
+                    <span style="font-size: 10px;">mins</span>
+                </div>
+                <div id="pomodoro-display" class="pomodoro-display">25:00</div>
+                <div class="pomodoro-controls">
+                    <button onclick="togglePomodoro()" id="pomodoro-btn">Iniciar</button>
+                    <button onclick="resetPomodoro()">Reiniciar</button>
+                </div>
+            </div>
+            <!-- Generador de Contraseñas -->
+            <div class="module" id="password-gen-module">
+                <h2>Generador de Contraseñas</h2>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <input type="number" id="pass-length" value="12" style="width: 40px;">
+                        <span style="font-size: 10px;">caracteres</span>
+                    </div>
+                    <button onclick="generatePass()" style="width: 100%;">Generar</button>
+                    <input type="text" id="generated-pass" readonly
+                        style="width: 100%; box-sizing: border-box; font-family: monospace; text-align: center;">
+                </div>
+            </div>
+            <!-- Conversor de Unidades -->
+            <div class="module" id="unit-conv-module">
+                <h2>Conversor de Unidades</h2>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                        <input type="number" id="unit-value" placeholder="Valor" style="width: 50%;">
+                        <select id="unit-type" style="width: 50%; font-size: 10px;">
+                            <option value="km-mi">Km -> Mi</option>
+                            <option value="mi-km">Mi -> Km</option>
+                            <option value="c-f">°C -> °F</option>
+                            <option value="f-c">°F -> °C</option>
+                            <option value="kg-lb">Kg -> Lb</option>
+                            <option value="lb-kg">Lb -> Kg</option>
+                        </select>
+                    </div>
+                    <button onclick="convertUnits()">Convertir</button>
+                    <div id="unit-result" style="text-align: center; font-weight: bold; margin-top: 5px;">---</div>
+                </div>
+            </div>
+            <!-- Notas Rápidas -->
+            <div class="module" id="notes-module">
+                <h2>Notas Rápidas</h2>
+                <textarea id="quick-notes" class="notes-area" placeholder="Escribe algo aquí..."
+                    oninput="saveNotes()"></textarea>
+            </div>
+            <!-- Buscador Rápido -->
+            <div class="module" id="search-module">
+                <h2>Buscador Rápido</h2>
+                <div class="search-module">
+                    <input type="text" id="search-query" placeholder="Buscar en Google...">
+                    <button onclick="performSearch()">Ir</button>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 5px;">
+                    <label style="font-size: 9px; cursor: pointer;">
+                        <input type="radio" name="search-engine" value="google" checked> Google
+                    </label>
+                    <label style="font-size: 9px; cursor: pointer;">
+                        <input type="radio" name="search-engine" value="wiki"> Wikipedia
+                    </label>
+                </div>
+            </div>
+            <!-- Frase del Día -->
+            <div class="module" id="quote-module">
+                <h2>Frase del Día</h2>
+                <div id="quote-container">
+                    <p id="quote-text" class="quote-text">Cargando frase...</p>
+                    <p id="quote-author" class="quote-author"></p>
+                </div>
+                <button onclick="fetchQuote()" style="width: 100%; font-size: 9px;">Nueva frase</button>
+            </div>
+            <!-- Calculadora de IMC -->
+            <div class="module" id="bmi-module">
+                <h2>Calculadora de IMC</h2>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div style="display: flex; gap: 5px; align-items: center;">
+                        <input type="number" id="bmi-weight" placeholder="Kg" style="width: 50%;">
+                        <input type="number" id="bmi-height" placeholder="Cm" style="width: 50%;">
+                    </div>
+                    <button onclick="calculateBMI()">Calcular</button>
+                    <div id="bmi-result" class="bmi-result">---</div>
+                </div>
+            </div>
         </div>
     </div>
     <div class="footer">
-        &copy; 2025 Mi Blog Retro. Inspirado en la web de los 2000s.
+        &copy; 2025 Módulos.
     </div>
     <script>
         // Mostrar hora local en tiempo real (formato 12 horas)
@@ -177,7 +300,269 @@
                 `Edad: ${años} años, ${meses} meses, ${dias} días.`;
             return false;
         }
+
+        // --- LÓGICA DE NUEVOS MÓDULOS ---
+
+        // 1. To-Do List
+        let todos = JSON.parse(localStorage.getItem('dashboardTodos')) || [];
+        function saveTodos() { localStorage.setItem('dashboardTodos', JSON.stringify(todos)); renderTodos(); }
+        function addTodo() {
+            const input = document.getElementById('todo-input');
+            const text = input.value.trim();
+            if (text) {
+                const exists = todos.some(t => t.text.toLowerCase() === text.toLowerCase());
+                if (exists) {
+                    alert('Esta tarea ya existe en la lista.');
+                    return;
+                }
+                todos.push({ text: text, completed: false });
+                input.value = '';
+                saveTodos();
+            }
+        }
+        function renderTodos() {
+            const list = document.getElementById('todo-list');
+            list.innerHTML = '';
+            todos.forEach((todo, index) => {
+                const li = document.createElement('li');
+                li.className = 'todo-item' + (todo.completed ? ' completed' : '');
+                li.innerHTML = `
+                    <input type="checkbox" ${todo.completed ? 'checked' : ''} onclick="toggleTodo(${index})">
+                    <span class="todo-text">${index + 1}. ${todo.text}</span>
+                    <button onclick="removeTodo(${index})" class="todo-remove-btn">x</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+        function toggleTodo(index) { todos[index].completed = !todos[index].completed; saveTodos(); }
+        function removeTodo(index) { todos.splice(index, 1); saveTodos(); }
+        renderTodos();
+
+        // 2. Pomodoro Timer
+        let pomodoroTimer;
+        let timeLeft = 25 * 60;
+        let isRunning = false;
+        function updatePomodoroDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('pomodoro-display').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        function togglePomodoro() {
+            if (isRunning) {
+                clearInterval(pomodoroTimer);
+                document.getElementById('pomodoro-btn').textContent = 'Iniciar';
+            } else {
+                if (timeLeft === 25 * 60) {
+                    const customMins = parseInt(document.getElementById('pomodoro-mins').value);
+                    if (!isNaN(customMins) && customMins > 0) timeLeft = customMins * 60;
+                }
+                pomodoroTimer = setInterval(() => {
+                    timeLeft--;
+                    updatePomodoroDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(pomodoroTimer);
+                        alert('¡Tiempo cumplido!');
+                        resetPomodoro();
+                    }
+                }, 1000);
+                document.getElementById('pomodoro-btn').textContent = 'Pausar';
+            }
+            isRunning = !isRunning;
+        }
+        function resetPomodoro() {
+            clearInterval(pomodoroTimer);
+            isRunning = false;
+            const customMins = parseInt(document.getElementById('pomodoro-mins').value);
+            timeLeft = (!isNaN(customMins) && customMins > 0) ? customMins * 60 : 25 * 60;
+            updatePomodoroDisplay();
+            document.getElementById('pomodoro-btn').textContent = 'Iniciar';
+        }
+
+        // 3. Password Generator
+        function generatePass() {
+            const length = document.getElementById('pass-length').value;
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+            let retVal = "";
+            for (let i = 0; i < length; ++i) retVal += charset.charAt(Math.floor(Math.random() * charset.length));
+            document.getElementById('generated-pass').value = retVal;
+        }
+
+        // 4. Unit Converter
+        function convertUnits() {
+            const val = parseFloat(document.getElementById('unit-value').value);
+            const type = document.getElementById('unit-type').value;
+            let result = 0;
+            let label = "";
+            if (isNaN(val)) return;
+            switch (type) {
+                case 'km-mi': result = val * 0.621371; label = "Mi"; break;
+                case 'mi-km': result = val / 0.621371; label = "Km"; break;
+                case 'c-f': result = (val * 9 / 5) + 32; label = "°F"; break;
+                case 'f-c': result = (val - 32) * 5 / 9; label = "°C"; break;
+                case 'kg-lb': result = val * 2.20462; label = "Lb"; break;
+                case 'lb-kg': result = val / 2.20462; label = "Kg"; break;
+            }
+            document.getElementById('unit-result').textContent = `${result.toFixed(2)} ${label}`;
+        }
+
+        // 5. Quick Notes
+        document.getElementById('quick-notes').value = localStorage.getItem('dashboardNotes') || '';
+        function saveNotes() { localStorage.setItem('dashboardNotes', document.getElementById('quick-notes').value); }
+
+        // 6. Quick Search
+        function performSearch() {
+            const query = document.getElementById('search-query').value;
+            const engine = document.querySelector('input[name="search-engine"]:checked').value;
+            if (!query) return;
+            const url = engine === 'google' ? `https://www.google.com/search?q=${query}` : `https://es.wikipedia.org/wiki/Special:Search?search=${query}`;
+            window.open(url, '_blank');
+        }
+
+        // 7. Frase del Día (Con fallback local)
+        const localQuotes = [
+            { quote: "La mejor forma de predecir el futuro es creándolo.", author: "Peter Drucker" },
+            { quote: "No cuentes los días, haz que los días cuenten.", author: "Muhammad Ali" },
+            { quote: "El único modo de hacer un gran trabajo es amar lo que haces.", author: "Steve Jobs" },
+            { quote: "La innovación diferencia a un líder de un seguidor.", author: "Steve Jobs" },
+            { quote: "Si puedes soñarlo, puedes hacerlo.", author: "Walt Disney" },
+            { quote: "La vida es lo que pasa mientras estás ocupado haciendo otros planes.", author: "John Lennon" },
+            { quote: "El éxito es la suma de pequeños esfuerzos repetidos día tras día.", author: "Robert Collier" },
+            { quote: "No busqueis los errores, buscad un remedio.", author: "Henry Ford" }
+        ];
+
+        function fetchQuote() {
+            document.getElementById('quote-text').textContent = "Cargando frase...";
+            document.getElementById('quote-author').textContent = "";
+
+            // Usamos un Gist de GitHub con +100 frases en español para mayor variedad y confiabilidad
+            const gistUrl = 'https://gist.githubusercontent.com/amr89-dev/96f5ed6b5461c65abd9b336f23616e38/raw/quotes_es.json';
+            fetch(gistUrl)
+                .then(r => {
+                    if (!r.ok) throw new Error("Gist error");
+                    return r.json();
+                })
+                .then(data => {
+                    // Seleccionamos una frase aleatoria de la lista de GitHub
+                    const randomQuote = data.quotes[Math.floor(Math.random() * data.quotes.length)];
+                    document.getElementById('quote-text').textContent = `"${randomQuote.quote}"`;
+                    document.getElementById('quote-author').textContent = `- ${randomQuote.author}`;
+                })
+                .catch(() => {
+                    // Fallback a frase aleatoria local si falla el Gist
+                    const randomQuote = localQuotes[Math.floor(Math.random() * localQuotes.length)];
+                    document.getElementById('quote-text').textContent = `"${randomQuote.quote}"`;
+                    document.getElementById('quote-author').textContent = `- ${randomQuote.author} (Modo offline)`;
+                });
+        }
+        fetchQuote();
+
+        // 8. BMI Calculator
+        function calculateBMI() {
+            const w = parseFloat(document.getElementById('bmi-weight').value);
+            const h = parseFloat(document.getElementById('bmi-height').value) / 100;
+            if (w > 0 && h > 0) {
+                const bmi = w / (h * h);
+                let cat = "";
+                if (bmi < 18.5) cat = "Bajo peso";
+                else if (bmi < 25) cat = "Normal";
+                else if (bmi < 30) cat = "Sobrepeso";
+                else cat = "Obesidad";
+                document.getElementById('bmi-result').textContent = `IMC: ${bmi.toFixed(1)} (${cat})`;
+            }
+        }
     </script>
     <script src="divisas.js"></script>
+    <script>
+        // Lógica de reordenamiento (Drag and Drop)
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = id => document.getElementById(id);
+            const modulesContainer = container('modules-container');
+            const btnEditMode = container('btn-edit-mode');
+            const modules = document.querySelectorAll('.module');
+
+            let isEditMode = false;
+            let draggedItem = null;
+
+            // Cargar orden guardado
+            const savedOrder = JSON.parse(localStorage.getItem('modulesOrder'));
+            if (savedOrder) {
+                const fragment = document.createDocumentFragment();
+                savedOrder.forEach(id => {
+                    const el = container(id);
+                    if (el) fragment.appendChild(el);
+                });
+                // Añadir cualquier módulo nuevo que no esté en el orden guardado
+                modules.forEach(el => {
+                    if (!savedOrder.includes(el.id)) fragment.appendChild(el);
+                });
+                modulesContainer.appendChild(fragment);
+            }
+
+            // Toggle modo edición
+            btnEditMode.addEventListener('click', () => {
+                isEditMode = !isEditMode;
+                btnEditMode.textContent = isEditMode ? 'Guardar orden' : 'Editar orden';
+                btnEditMode.classList.toggle('active', isEditMode);
+                modulesContainer.classList.toggle('edit-mode', isEditMode);
+
+                // Habilitar/deshabilitar draggable
+                document.querySelectorAll('.module').forEach(m => {
+                    m.setAttribute('draggable', isEditMode);
+                });
+
+                if (!isEditMode) {
+                    // Guardar nuevo orden al salir del modo edición
+                    const currentOrder = Array.from(modulesContainer.children).map(m => m.id);
+                    localStorage.setItem('modulesOrder', JSON.stringify(currentOrder));
+                }
+            });
+
+            modulesContainer.addEventListener('dragstart', (e) => {
+                if (isEditMode && e.target.classList.contains('module')) {
+                    draggedItem = e.target;
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                }
+            });
+
+            modulesContainer.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('module')) {
+                    e.target.classList.remove('dragging');
+                    draggedItem = null;
+                }
+            });
+
+            modulesContainer.addEventListener('dragover', (e) => {
+                if (!isEditMode) return;
+                e.preventDefault();
+                const afterElement = getDragAfterElement(modulesContainer, e.clientX, e.clientY);
+                if (draggedItem) {
+                    if (afterElement == null) {
+                        modulesContainer.appendChild(draggedItem);
+                    } else {
+                        modulesContainer.insertBefore(draggedItem, afterElement);
+                    }
+                }
+            });
+
+            function getDragAfterElement(container, x, y) {
+                const draggableElements = [...container.querySelectorAll('.module:not(.dragging)')];
+
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const centerX = box.left + box.width / 2;
+                    const centerY = box.top + box.height / 2;
+                    const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+
+                    if (distance < closest.offset) {
+                        return { offset: distance, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.POSITIVE_INFINITY }).element;
+            }
+        });
+    </script>
 </body>
+
 </html>
